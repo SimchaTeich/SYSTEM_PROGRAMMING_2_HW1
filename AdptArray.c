@@ -62,35 +62,40 @@ Result SetAdptArrayAt(PAdptArray paa, int index, PElement pe)
 		{
 			paa->delete_element(paa->arr[index]);
 		}
-		
-		// assign a copy of the new element.
-		paa->arr[index] = paa->copy_element(pe);
 	}
 	else
 	{
-		// the first time
+		// if this is the first time of inserting element.
 		if (!paa->arr)
 		{
 			paa->arr = (PElement*)calloc(index + 1, sizeof(PElement));
+			if(paa->arr)
+			{
+				paa->size = index + 1;
+			}
+			else{ paa->size = -1; }
 		}
 		else
 		{
 			//paa->arr = (PElement*)realloc(paa->arr, sizeof(PElement) * (index + 1));
 			PElement* new_arr = (PElement*)calloc(index + 1, sizeof(PElement));
-			for (int i = 0; i < paa->size; i++)
+			if(new_arr)
 			{
-				new_arr[i] = paa->arr[i];
+				for (int i = 0; i < paa->size; i++)
+				{
+					new_arr[i] = paa->arr[i];
+				}
+				free(paa->arr);
+				
+				paa->arr = new_arr;
+				paa->size = index + 1;
 			}
-			free(paa->arr);
-			paa->arr = new_arr;
+			else { paa->size = -1; }
 		}
-
-		// assign a copy of the new element.
-		paa->arr[index] = paa->copy_element(pe);
-		
-		// update the new size. (-1 at fails)
-		paa->size = (paa->arr != NULL) ? index + 1 : -1;
 	}
+
+	// assign a copy of the new element.
+	if(paa->size != -1) {paa->arr[index] = paa->copy_element(pe);}
 
 	return paa->size != -1 ? SUCCESS : FAIL;
 }
