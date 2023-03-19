@@ -16,12 +16,13 @@ typedef struct AdptArray_
 PAdptArray CreateAdptArray(COPY_FUNC copy, DEL_FUNC del, PRINT_FUNC print)
 {
 	PAdptArray paa = (PAdptArray)malloc(sizeof(AdptArray));
+
 	paa->arr = NULL;
 	paa->size = 0;
 	paa->copy_element = copy;
 	paa->delete_element = del;
 	paa->print_element = print;
-	return paa;
+	return paa; // NULL if malloc was failed.
 }
 
 
@@ -38,7 +39,7 @@ void DeleteAdptArray(PAdptArray paa)
 	}
 	
 	// free the array itself. 
-	if (paa->size != 0) {free(paa->arr);}
+	if (paa->arr) {free(paa->arr);}
 	paa->arr = NULL;
 
 	// clean the rest.
@@ -68,7 +69,7 @@ Result SetAdptArrayAt(PAdptArray paa, int index, PElement pe)
 	else
 	{
 		// the first time
-		if (paa->size == 0)
+		if (!paa->arr)
 		{
 			paa->arr = (PElement*)calloc(index + 1, sizeof(PElement));
 		}
